@@ -1,4 +1,10 @@
 document.addEventListener('DOMContentLoaded', async () => {
+    // 环境检测：非 KernelSU WebUI 环境时显示提示横幅
+    if (!isKsuAvailable()) {
+        const banner = document.getElementById('env-banner');
+        if (banner) banner.style.display = '';
+    }
+
     initSliders();
     initSaveButton();
     initNav();
@@ -105,6 +111,40 @@ async function refreshData() {
     document.getElementById('val-guard-status').textContent = guardStatus || '--';
     document.getElementById('val-real-temp').textContent = realTemp ? realTemp + '°C' : '--';
     document.getElementById('log-content').textContent = log || '暂无日志';
+
+    // 逐通道读回验证伪装是否真正生效
+    refreshSpoofStatus();
+}
+
+// 读回验证：对比节点实际值与配置目标值，判断伪装是否生效
+async function refreshSpoofStatus() {
+    const map = { CPU: 'cpu', GPU: 'gpu', DDR: 'ddr', BAT: 'battery' };
+    let targets = {};
+    try { targets = await loadTargetsRaw(); } catch (e) { targets = {}; }
+
+    for (const [ch, keyword] of Object.entries(map)) {
+        const el = document.getElementById('spoof-' + ch.toLowerCase());
+        if (!el) continue;
+
+        const target = targets[ch];
+        if (!target) {
+            el.textContent = '未配置';
+            el.className = 'badge badge-off';
+            continue;
+        }
+
+        const actual = await readTempRaw(keyword);
+        if (actual === null) {
+            el.textContent = '无节点';
+            el.className = 'badge badge-off';
+        } else if (Math.abs(actual - target) <= 500) {
+            el.textContent = '生效';
+            el.className = 'badge badge-ok';
+        } else {
+            el.textContent = '被打回 ' + (actual / 1000).toFixed(1) + '°C';
+            el.className = 'badge badge-warn';
+        }
+    }
 }
 
 function initOverclock() {

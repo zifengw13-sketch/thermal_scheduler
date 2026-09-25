@@ -80,6 +80,34 @@ async function loadTargets() {
     return targets;
 }
 
+// 读取原始温度值（毫摄氏度），用于伪装读回验证
+async function readTempRaw(keyword) {
+    const cmd = `for zone in /sys/class/thermal/thermal_zone*/; do
+        type=$(cat "$zone/type" 2>/dev/null | tr 'A-Z' 'a-z')
+        case "$type" in
+            *${keyword}*)
+                temp=$(cat "$zone/temp" 2>/dev/null)
+                [ -n "$temp" ] && echo "$temp" && break
+                ;;
+        esac
+    done`;
+    const output = await execCmd(cmd);
+    const raw = parseInt(output.trim(), 10);
+    if (isNaN(raw)) return null;
+    return raw;
+}
+
+// 读取配置中的原始目标值（毫摄氏度）
+async function loadTargetsRaw() {
+    const output = await execCmd('cat /data/adb/modules/thermal_scheduler/config/targets.conf 2>/dev/null');
+    const targets = {};
+    output.split('\n').forEach(line => {
+        const [key, val] = line.split('=');
+        if (key && val) targets[key] = parseInt(val, 10);
+    });
+    return targets;
+}
+
 async function getAvailableFreqs(policyIndex) {
     const output = await execCmd(`cat /sys/devices/system/cpu/cpufreq/policy${policyIndex}/available_frequencies 2>/dev/null`);
     if (!output.trim()) return [];

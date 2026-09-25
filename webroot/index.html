@@ -16,6 +16,12 @@
         <p class="subtitle">伪删温控 · 智能调度 · 实时监控</p>
     </header>
 
+    <!-- 环境检测横幅 -->
+    <div class="warning-banner" id="env-banner" style="display:none;">
+        ⚠️ 未检测到 KernelSU WebUI 环境。请通过 KernelSU 管理器的模块页或 KsuWebUI 打开本页面；
+        普通浏览器无法连接系统，所有数据将显示为 --，且操作不会生效。
+    </div>
+
     <!-- 实时状态面板 -->
     <section class="glass-card" id="realtime-panel">
         <h2>实时状态</h2>
@@ -44,6 +50,14 @@
                 <span class="label">真实温度</span>
                 <span class="value" id="val-real-temp">--</span>
             </div>
+        </div>
+
+        <!-- 伪装通道读回状态 -->
+        <div class="spoof-status">
+            <div class="spoof-row"><span>CPU 伪装</span><span class="badge" id="spoof-cpu">检测中</span></div>
+            <div class="spoof-row"><span>GPU 伪装</span><span class="badge" id="spoof-gpu">检测中</span></div>
+            <div class="spoof-row"><span>DDR 伪装</span><span class="badge" id="spoof-ddr">检测中</span></div>
+            <div class="spoof-row"><span>电池伪装</span><span class="badge" id="spoof-bat">检测中</span></div>
         </div>
     </section>
 
