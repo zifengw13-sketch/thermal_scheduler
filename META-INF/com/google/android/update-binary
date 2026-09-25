@@ -1,0 +1,29 @@
+#!/sbin/sh
+umask 022
+
+OUTFD=$2
+ZIPFILE=$3
+
+ui_print() {
+    echo -e "ui_print $1\nui_print" >> /proc/self/fd/$OUTFD
+}
+
+ui_print "*******************************"
+ui_print "  星驰调度·伪删温控 v1.0.0"
+ui_print "*******************************"
+
+MODPATH="/data/adb/modules/thermal_scheduler"
+mkdir -p "$MODPATH"
+
+unzip -o "$ZIPFILE" -d "$MODPATH" >/dev/null 2>&1
+
+chmod 755 "$MODPATH/bin/thermal_guard" 2>/dev/null
+chmod 755 "$MODPATH/service.sh" 2>/dev/null
+chmod 755 "$MODPATH/sched_manager.sh" 2>/dev/null
+chmod 755 "$MODPATH/apply_spoof.sh" 2>/dev/null
+chmod 755 "$MODPATH/uninstall.sh" 2>/dev/null
+
+mkdir -p "$MODPATH/config"
+mkdir -p "$MODPATH/config/device_templates"
+
+ui_print "安装完成，请重启设备生效"

@@ -1,0 +1,7 @@
+ro.product.brand=OnePlus
+ro.product.manufacturer=OnePlus
+ro.product.model=PKG110
+ro.product.device=PKG110
+ro.product.name=PKG110
+ro.boot.prjname=23851
+ro.build.fingerprint=OnePlus/PKG110/PKG110:15/AP3A.240905.015/1734589607:user/release-keys
